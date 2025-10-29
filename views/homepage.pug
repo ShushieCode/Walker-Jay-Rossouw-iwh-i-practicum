@@ -1,0 +1,28 @@
+doctype html
+html
+  head
+    title Character Sheets | Integrating With HubSpot I Practicum
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    link(rel="stylesheet", href="/css/style.css")
+  body
+    header
+      nav
+        a(href="/") Home
+        |  | 
+        a(href="/update-cobj") Create/Update Record
+    main
+      h1 Character Sheets
+      if records && records.length
+        .cards
+          each record in records
+            .card
+              h2.card__name #{record.name}
+              p
+                strong Race: 
+                |  #{record.race || '—'}
+              p
+                strong Class: 
+                |  #{record.class_name || '—'}
+      else
+        p No records found.
+

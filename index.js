@@ -8,6 +8,7 @@ const app = express();
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
 
 const HUBSPOT_ACCESS_TOKEN = process.env.HUBSPOT_ACCESS_TOKEN;
 const HUBSPOT_API_URL = 'https://api.hubapi.com/crm/v3/objects';
@@ -21,7 +22,7 @@ app.get('/update-cobj', (req, res) => {
 });
 
 app.post('/update-cobj', async (req, res) => {
-  const { name, race, class_name, record_id } = req.body;
+  const { name, race, class_name } = req.body;
 
   try {
     await axios.post(
@@ -30,8 +31,7 @@ app.post('/update-cobj', async (req, res) => {
         properties: {
           name,
           race,
-          class_name,
-          record_id
+          class_name
         },
       },
       {
@@ -58,7 +58,7 @@ app.get('/', async (req, res) => {
         Accept: 'application/json',
       },
       params: {
-        properties: ['name', 'race', 'class_name'],
+        properties: 'name,race,class_name',
         limit: 100,
       },
     });
@@ -66,8 +66,7 @@ app.get('/', async (req, res) => {
     const records = response.data.results.map((record) => ({
       name: record.properties.name,
       race: record.properties.race,
-      class_name: record.properties.class_name,
-      record_id: record.properties.record_id,
+      class_name: record.properties.class_name
     }));
 
     res.render('homepage', { records });
