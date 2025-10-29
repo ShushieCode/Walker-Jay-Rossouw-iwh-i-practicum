@@ -11,7 +11,8 @@ app.use(express.urlencoded({ extended: true }));
 
 const HUBSPOT_ACCESS_TOKEN = process.env.HUBSPOT_ACCESS_TOKEN;
 const HUBSPOT_API_URL = 'https://api.hubapi.com/crm/v3/objects';
-const CUSTOM_OBJECT = 'character_sheets';
+const CUSTOM_OBJECT = process.env.HUBSPOT_OBJECT_TYPE || 'character_sheets';
+console.log('Using HubSpot object type:', CUSTOM_OBJECT);
 
 app.get('/update-cobj', (req, res) => {
   res.render('updates', {
@@ -54,20 +55,24 @@ app.get('/', async (req, res) => {
     const response = await axios.get(`${HUBSPOT_API_URL}/${CUSTOM_OBJECT}`, {
       headers: {
         Authorization: `Bearer ${HUBSPOT_ACCESS_TOKEN}`,
+        Accept: 'application/json',
+      },
+      params: {
+        properties: ['name', 'race', 'class_name'],
+        limit: 100,
       },
     });
 
-const records = response.data.results.map((record) => ({
-  name: record.properties.name,
-  race: record.properties.race,
-  class_name: record.properties.class_name,
-  record_id: record.properties.record_id,
-}));
-
+    const records = response.data.results.map((record) => ({
+      name: record.properties.name,
+      race: record.properties.race,
+      class_name: record.properties.class_name,
+      record_id: record.properties.record_id,
+    }));
 
     res.render('homepage', { records });
   } catch (error) {
-    console.error('Error fetching records:', error.message);
+    console.error('Error fetching records:', error.response?.data || error.message);
     res.render('homepage', { records: [] });
   }
 });
