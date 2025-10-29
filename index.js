@@ -20,7 +20,7 @@ app.get('/update-cobj', (req, res) => {
 });
 
 app.post('/update-cobj', async (req, res) => {
-  const { name, race, class, record_id } = req.body;
+  const { name, race, class_name, record_id } = req.body;
 
   try {
     await axios.post(
